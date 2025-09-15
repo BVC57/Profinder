@@ -51,6 +51,7 @@ import React, { useState, useEffect } from "react";
   import EditAdminDialog from "./EditAdminDialog";
   import { useAuth } from "../contexts/AuthContext";
   import axios from "../api/axios";
+  import { useNavigate } from "react-router-dom";
 
   const AdminProfileDialog = ({
     open,
@@ -60,6 +61,7 @@ import React, { useState, useEffect } from "react";
     onAdminUpdated,
     onAdminDeleted,
   }) => {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -193,6 +195,7 @@ import React, { useState, useEffect } from "react";
         // Show success message
         setSuccessMessage("Payment successful! Your service request has been submitted and will appear in your requests list.");
         setShowSuccess(true);
+        navigate('/requests');
         setTimeout(() => {
           setShowSuccess(false);
         }, 3000);
@@ -1165,13 +1168,7 @@ import React, { useState, useEffect } from "react";
             flexDirection: 'column',
             py: 3
           }}>
-            <PaymentIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
-              ₹5.00
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, textAlign: 'center' }}>
-              Service Request Fee
-            </Typography>
+           
             
             <RazorpayButton 
               amount={500} 

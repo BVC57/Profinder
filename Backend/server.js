@@ -17,6 +17,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const userRequestRoutes = require('./routes/userRequestRoutes');
 const activityRoutes = require('./routes/activityRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const startCronJobs  = require('./cornjob/index');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -43,6 +44,7 @@ mongoose.connect(config.MONGO_URI, {
   useUnifiedTopology: true
 }).then(() => {
   console.log('MongoDB connected successfully');
+  startCronJobs(); // start cron
 }).catch((err) => {
   console.error('MongoDB connection error:', err.message);
   process.exit(1);

@@ -47,7 +47,7 @@ const Login = () => {
 
 
   useEffect(() => {
-    if (form.email && !form.email.includes("@gmail.com")) {
+    if (form.email && !form.email.includes(".com")) {
       setEmailError("Email must include @gmail.com");
     } else {
       setEmailError("");

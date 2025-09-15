@@ -103,8 +103,8 @@ const ProPlanSection = () => {
                   onClose={() => setPaymentOpen(false)}
                   onSuccess={handlePaymentSuccess}
                   amount={10000} // ₹100 in paise
-                  description="Upgrade to Pro Plan"
-                  paymentType="ProPlanUpgrade"
+                  description=" to Pro Plan"
+                  paymentType="ProPlan"
                   showPaymentHistory={false}
                 />
               </>

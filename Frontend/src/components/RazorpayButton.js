@@ -115,6 +115,7 @@ const PaymentRequestPage = ({
           
           if (onSuccess) {
             onSuccess(savedPayment);
+            navigate('/requests');
           } else {
             alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
             window.location.href = "/";

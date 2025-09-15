@@ -21,7 +21,24 @@ const Payment = require('../models/PaymentSchema');
 
 router.post('/submit', auth, uploadMultiple, handleUploadError, async (req, res) => {
   try {
-    const { profession, experience, city, pincode, gender,mobile_number,address,state } = req.body;
+    const { profession, experience, city, pincode, gender,mobile_number,address,state,skills, specializations } = req.body;
+
+      // Ensure skills and specializations are always arrays
+    if (typeof skills === "string") {
+      try {
+        skills = JSON.parse(skills); // if it's stringified array
+      } catch {
+        skills = skills.split(",").map(s => s.trim()); // fallback: comma separated
+      }
+    }
+
+    if (typeof specializations === "string") {
+      try {
+        specializations = JSON.parse(specializations);
+      } catch {
+        specializations = specializations.split(",").map(s => s.trim());
+      }
+    }
 
     if (!profession || !experience || !city || !pincode) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -103,10 +120,11 @@ router.post('/submit', auth, uploadMultiple, handleUploadError, async (req, res)
       pincode,
       aadharCard,
       voterId,
-      profilePhoto, // <-- add this line
-      status: 'pending'
+      profilePhoto,
+      status: 'pending',
+      skills,
+      specializations
     });
-
     await adminProfile.save();
 
     // Create notification for all super admins
@@ -133,7 +151,7 @@ router.post('/submit', auth, uploadMultiple, handleUploadError, async (req, res)
       });
     }
 
-    res.json({ message: 'Admin profile submitted and pending verification' });
+    res.json({ message: 'Admin profile submitted and pending for request verification' });
 
   } catch (error) {
     console.error('Admin profile submit error:', error);
@@ -144,7 +162,7 @@ router.post('/submit', auth, uploadMultiple, handleUploadError, async (req, res)
 // ✅ Get All Verified Admins
 router.get('/verified', async (req, res) => {
   try {
-    const admins = await AdminProfile.find({ status: 'verified' }).populate('userId', 'name email mobile profilePhoto gender');
+    const admins = await AdminProfile.find({ status: 'verified' }).populate('userId', 'name email mobile profilePhoto gender').select('-subscription');
     
     // Map the data to include profile photo from User model
     const adminsWithPhotos = admins.map(admin => ({

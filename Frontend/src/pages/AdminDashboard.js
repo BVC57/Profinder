@@ -168,7 +168,7 @@ const AdminDashboard = () => {
     },
     { id: "Pending Requests", text: "Pending Requests", icon: <PendingIcon /> },
     // Pro Plan menu item
-    { id: "pro-plan", text: "Pro Plan", icon: <StarIcon color="warning" /> },
+    { id: "pro-plan", text: "Subscribe Plan", icon: <StarIcon color="warning" /> },
   ];
 
   // Section header text

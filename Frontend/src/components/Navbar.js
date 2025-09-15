@@ -241,7 +241,7 @@ const Navbar = () => {
       { text: 'Home', path: '/', icon: <HomeIcon /> },
       { text: 'About Us', path: '/about', icon: <AboutIcon /> },
       { text: 'Contact Us', path: '/contact', icon: <ContactIcon /> },
-      { text: 'Become Professional', path: '/admin-form', icon: <FormIcon /> },
+      { text: 'Become Professional', path: '/joinus', icon: <FormIcon /> },
     ] : []),
     // Admin: show admin menus
     ...(isAuthenticated && user?.role === 'admin' ? [

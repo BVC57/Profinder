@@ -15,12 +15,16 @@ import {
   MenuItem,
   Input,
   FormHelperText,
-  Avatar
+  Avatar,
+  Chip,
+  IconButton
 } from '@mui/material';
-import { CloudUpload } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { CloudUpload, AddCircle, Delete } from '@mui/icons-material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from '../api/axios';
+import { use } from 'react';
 // import LocationMap from './LocationMap';
 
 const validationSchema = Yup.object().shape({
@@ -38,6 +42,8 @@ const validationSchema = Yup.object().shape({
   village: Yup.string().required('Village is required'),
   taluka: Yup.string().required('Taluka is required'),
   district: Yup.string().required('District is required'),
+  skills: Yup.array().of(Yup.string().required("Skill cannot be empty")),
+  specializations: Yup.array().of(Yup.string().required("Specialization cannot be empty")),
 });
 
 const initialValues = {
@@ -56,7 +62,12 @@ const initialValues = {
   village: '',
   taluka: '',
   district: '',
+  amount:'5',
+  skills: [],
+  specializations: []
 };
+
+
 
 // Commented out Google Maps API key - needs proper configuration
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCCRDdzC4-8aMliCT4at-LTN0bB12GwkA0';
@@ -84,11 +95,14 @@ const fetchAddressFromCoords = async (lat, lng) => {
 };
 
 const AdminForm = () => {
+  const navigate = useNavigate();
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   // const [selectedLocation, setSelectedLocation] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
+  const [skillInput, setSkillInput] = useState('');
+  const [specializationInput, setSpecializationInput] = useState('');
 
   // const handleLocationSelect = (location, setFieldValue) => {
   //   console.log('handleLocationSelect received:', location);
@@ -108,10 +122,35 @@ const AdminForm = () => {
     }
   };
 
+  const handleAddSkill = (setFieldValue, values) => {
+    if (skillInput.trim() !== '') {
+      setFieldValue('skills', [...values.skills, skillInput.trim()]);
+      setSkillInput('');
+    }
+  };
+
+  const handleRemoveSkill = (index, setFieldValue, values) => {
+    const newSkills = [...values.skills];
+    newSkills.splice(index, 1);
+    setFieldValue('skills', newSkills);
+  };
+
+  const handleAddSpecialization = (setFieldValue, values) => {
+    if (specializationInput.trim() !== '') {
+      setFieldValue('specializations', [...values.specializations, specializationInput.trim()]);
+      setSpecializationInput('');
+    }
+  };
+
+  const handleRemoveSpecialization = (index, setFieldValue, values) => {
+    const newSpecs = [...values.specializations];
+    newSpecs.splice(index, 1);
+    setFieldValue('specializations', newSpecs);
+  };
+
+
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     setLoading(true);
-    setMessage('');
-    setError('');
     // Validate at least one identity document
     if (!values.aadharCard && !values.voterId) {
       toast.error('Please upload at least one identity document (Aadhar Card or Voter ID)');
@@ -122,20 +161,23 @@ const AdminForm = () => {
     try {
       const formDataToSend = new FormData();
       Object.keys(values).forEach((key) => {
-        if (values[key] && key !== 'profilePhoto' && key !== 'aadharCard' && key !== 'voterId') {
+        if (Array.isArray(values[key])) {
+          values[key].forEach((item) => formDataToSend.append(key, item));
+        } else if (values[key] && key !== 'profilePhoto' && key !== 'aadharCard' && key !== 'voterId') {
           formDataToSend.append(key, values[key]);
         }
       });
       if (values.profilePhoto) formDataToSend.append('profilePhoto', values.profilePhoto);
       if (values.aadharCard) formDataToSend.append('aadharCard', values.aadharCard);
       if (values.voterId) formDataToSend.append('voterId', values.voterId);
+
       const response = await axios.post('/api/admin/submit', formDataToSend, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       toast.success(response.data.message || "Form submitted successfully!");
+      navigate('/');
       resetForm();
       setProfilePreview(null);
-      // setSelectedLocation(null);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to submit admin form');
     } finally {
@@ -181,6 +223,9 @@ const AdminForm = () => {
         >
           {({ values, errors, touched, setFieldValue, isSubmitting }) => (
             <Form encType="multipart/form-data">
+              <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+                Personal & Professional Details
+              </Typography>
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Profession</InputLabel>
                 <Field
@@ -270,35 +315,60 @@ const AdminForm = () => {
                 error={touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
               />
-              {/* Profile Photo Upload */}
-              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar
-                  src={profilePreview}
-                  sx={{ width: 56, height: 56 }}
-                >
-                  {values.name?.charAt(0)?.toUpperCase() || 'P'}
-                </Avatar>
-                <label htmlFor="profile-photo-upload">
-                  <Input
-                    type="file"
-                    name="profilePhoto"
-                    id="profile-photo-upload"
-                    inputProps={{ accept: 'image/*' }}
-                    style={{ display: 'none' }}
-                    onChange={e => handleFileChange(e, setFieldValue, 'profilePhoto')}
-                  />
-                  <Button
-                    variant="outlined"
-                    component="span"
-                    startIcon={<CloudUpload />}
-                  >
-                    {values.profilePhoto ? values.profilePhoto.name : 'Upload Profile Photo'}
-                  </Button>
-                </label>
-                {values.profilePhoto && (
-                  <FormHelperText>Selected: {values.profilePhoto.name}</FormHelperText>
-                )}
+
+              {/* ✅ Skills Section */}
+              <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+                Skills
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Enter a skill"
+                  value={skillInput}
+                  onChange={(e) => setSkillInput(e.target.value)}
+                />
+                <IconButton color="primary" onClick={() => handleAddSkill(setFieldValue, values)}>
+                  <AddCircle />
+                </IconButton>
               </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {values.skills.map((skill, index) => (
+                  <Chip
+                    key={index}
+                    label={skill}
+                    onDelete={() => handleRemoveSkill(index, setFieldValue, values)}
+                    color="primary"
+                  />
+                ))}
+              </Box>
+
+              {/* ✅ Specializations Section */}
+              <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+                Specializations
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label="Enter a specialization"
+                  value={specializationInput}
+                  onChange={(e) => setSpecializationInput(e.target.value)}
+                />
+                <IconButton color="primary" onClick={() => handleAddSpecialization(setFieldValue, values)}>
+                  <AddCircle />
+                </IconButton>
+              </Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {values.specializations.map((spec, index) => (
+                  <Chip
+                    key={index}
+                    label={spec}
+                    onDelete={() => handleRemoveSpecialization(index, setFieldValue, values)}
+                    color="secondary"
+                  />
+                ))}
+              </Box>
+
+             
               {/* Google Maps Location Picker (disabled) */}
               {/* Hidden fields for latitude/longitude for Formik */}
               <input type="hidden" name="latitude" value={values.latitude} />
@@ -310,6 +380,9 @@ const AdminForm = () => {
                 <FormHelperText error>{errors.longitude}</FormHelperText>
               )}
               {/* Address Fields */}
+              <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+                Address Details
+              </Typography>
               <Field
                 as={TextField}
                 fullWidth
@@ -347,6 +420,38 @@ const AdminForm = () => {
               <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
                 Please upload at least one valid identity document for verification. Accepted formats: JPG, PNG, PDF (Max 10MB)
               </Typography>
+
+               {/* Profile Photo Upload */}
+              <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Avatar
+                  src={profilePreview}
+                  sx={{ width: 70, height: 70 }}
+                >
+                  {values.name?.charAt(0)?.toUpperCase() || 'P'}
+                </Avatar>
+                <label htmlFor="profile-photo-upload">
+                  <Input
+                    type="file"
+                    name="profilePhoto"
+                    id="profile-photo-upload"
+                    inputProps={{ accept: 'image/*' }}
+                    style={{ display: 'none' }}
+                    onChange={e => handleFileChange(e, setFieldValue, 'profilePhoto')}
+                  />
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<CloudUpload />}
+                    fullWidth
+                    sx={{ py: 2 , width: '400px'}}
+                  >
+                    {values.profilePhoto ? values.profilePhoto.name : 'Upload Profile Photo'}
+                  </Button>
+                </label>
+                {/* {values.profilePhoto && (
+                  <FormHelperText>Selected: {values.profilePhoto.name}</FormHelperText>
+                )} */}
+              </Box>
               {/* Aadhar Card Upload */}
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <Input

@@ -25,7 +25,6 @@ import SearchProfessionals from './pages/SearchProfessionals';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminProfile from './pages/AdminProfile';
 import SuperAdminPanel from './components/SuperAdmin/SuperAdminPanel';
-import VerifiedAdmins from './pages/VerifiedAdmins';
 import UserDataDashboardPage from './pages/UserDataDashboardPage';
 import RequestManagementPage from './pages/RequestManagementPage';
 import NotFound from './pages/NotFound';
@@ -36,6 +35,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import ComprehensivePaymentHandler from './components/ComprehensivePaymentHandler';
 import AdminPlanPaymentsPage from './pages/AdminPlanPaymentsPage';
+import JoinusPage from './pages/Joinus';
 
 function App() {
   return (
@@ -89,6 +89,7 @@ function AppContent() {
                   <Route path="/about" element={<AboutUsPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/contact" element={<ContactUsPage />} />
+                  <Route path="/joinus" element={<JoinusPage />} />
                   <Route path="*" element={<NotFound />} />
                     </Routes>
                   </Box>

@@ -39,19 +39,47 @@ const User = require("../models/User");
 
 exports.submitAdminForm = async (req, res) => {
   try {
-    const { profession, experience, city, pincode, mobile, email, latitude, longitude, gender } = req.body;
-  
-    // Get uploaded files
-    const aadharCard = req.files.aadharCard ? req.files.aadharCard[0].filename : null;
-    const voterId = req.files.voterId ? req.files.voterId[0].filename : null;
-    const profilePhoto = req.files.profilePhoto ? req.files.profilePhoto[0].filename : null;
-    // Validate that at least one identity document is uploaded
+    const {
+      profession,
+      experience,
+      city,
+      pincode,
+      mobile,
+      email,
+      latitude,
+      longitude,
+      gender,
+      skills,
+      specialization,
+    } = req.body;
+    
+
+    
+
+    // Handle uploaded files
+    const aadharCard = req.files?.aadharCard
+      ? req.files.aadharCard[0].filename
+      : null;
+    const voterId = req.files?.voterId ? req.files.voterId[0].filename : null;
+    const profilePhoto = req.files?.profilePhoto
+      ? req.files.profilePhoto[0].filename
+      : null;
+
+    // Validation
     if (!aadharCard && !voterId) {
-      return res.status(400).json({ message: 'Please upload at least one identity document (Aadhar Card or Voter ID)' });
+      return res
+        .status(400)
+        .json({
+          message:
+            "Please upload at least one identity document (Aadhar Card or Voter ID)",
+        });
     }
+
     const admin = new AdminProfile({
       userId: req.user.id,
       profession,
+      skills: Array.isArray(skills) ? skills : JSON.parse(skills || "[]"),
+      specializations: Array.isArray(specializations) ? specializations : JSON.parse(specializations || "[]"),
       experience,
       city,
       pincode,
@@ -62,18 +90,21 @@ exports.submitAdminForm = async (req, res) => {
       gender,
       profilePhoto,
       aadharCard,
-      voterId
+      voterId,
     });
+
     await admin.save();
-    // Optionally update User model as well
+
+    // Optionally update User model
     await User.findByIdAndUpdate(req.user.id, {
       gender,
       profilePhoto,
     });
-    res.json({ message: 'Admin profile submitted successfully' });
+
+    res.json({ message: "Admin profile submitted successfully", admin });
   } catch (error) {
-    console.error('Submit admin form error:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Submit admin form error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

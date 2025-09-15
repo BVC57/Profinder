@@ -12,6 +12,7 @@ exports.register = async (req, res) => {
   await user.save();
   res.json({ message: 'User registered' });
 };
+
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
