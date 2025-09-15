@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear ProFinder Tokens</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 ProFinder Token Fix</h1>
+        
+        <div class="info">
+            <h3>What this does:</h3>
+            <p>This page will clear all stored authentication tokens from your browser. This fixes the "JWT verification error: invalid signature" issue.</p>
+            <p><strong>After clearing tokens, you'll need to log in again.</strong></p>
+        </div>
+
+        <button class="button" onclick="clearTokens()">Clear All Tokens</button>
+        <button class="button" onclick="checkTokens()">Check Current Tokens</button>
+        
+        <div id="result"></div>
+        
+        <div style="margin-top: 30px;">
+            <h3>Next Steps:</h3>
+            <ol>
+                <li>Click "Clear All Tokens" above</li>
+                <li>Go back to your ProFinder application</li>
+                <li>Log in again with your credentials</li>
+                <li>The JWT errors should be resolved</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function clearTokens() {
+            try {
+                // Clear all ProFinder related tokens
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('role');
+                localStorage.removeItem('firstName');
+                localStorage.removeItem('lastName');
+                
+                // Also clear any session storage
+                sessionStorage.clear();
+                
+                document.getElementById('result').innerHTML = 
+                    '<p class="success">✅ All tokens cleared successfully!</p>' +
+                    '<p>You can now go back to ProFinder and log in again.</p>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<p class="error">❌ Error clearing tokens: ' + error.message + '</p>';
+            }
+        }
+        
+        function checkTokens() {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            const role = localStorage.getItem('role');
+            
+            let result = '<h4>Current Tokens:</h4>';
+            result += '<p><strong>Token:</strong> ' + (token ? 'Present' : 'Not found') + '</p>';
+            result += '<p><strong>User ID:</strong> ' + (userId || 'Not found') + '</p>';
+            result += '<p><strong>Role:</strong> ' + (role || 'Not found') + '</p>';
+            
+            if (token) {
+                result += '<p class="error">⚠️ Token found - this might be causing the JWT error. Clear tokens to fix.</p>';
+            } else {
+                result += '<p class="success">✅ No tokens found - you should be able to log in normally.</p>';
+            }
+            
+            document.getElementById('result').innerHTML = result;
+        }
+    </script>
+</body>
+</html> 
