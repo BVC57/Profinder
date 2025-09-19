@@ -131,6 +131,8 @@ const Navbar = () => {
           description: payment.description,
           preferredDate: payment.preferredDate,
           preferredTime: payment.preferredTime,
+          razorpayOrderId: payment.razorpayOrderId,
+          razorpayPaymentId: payment.razorpayPaymentId,
           error: payment.failureReason
         }));
         setPaymentHistory(formattedPayments);

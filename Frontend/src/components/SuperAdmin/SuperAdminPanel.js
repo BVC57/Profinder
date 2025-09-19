@@ -57,7 +57,6 @@ import { useSidebar } from '../../contexts/SidebarContext';
 import ActivityDashboard from './ActivityDashboard';
 import PendingAdminForVerificationRequest from './PendingAdminForVerificationRequest';
 import VerifiedAdminList from '../VerifiedAdminList';
-import Navbar from '../Navbar';
 import PaymentPage from './Payment';
 import Settings from '../Settings';
 import ContactSubmissionsPanel from './ContactSubmissionsPanel';

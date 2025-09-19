@@ -43,13 +43,21 @@ import {
   FilterList as FilterListIcon,
 } from "@mui/icons-material";
 import {
-  PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell
+  PieChart,
+  Pie,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useSidebar } from "../contexts/SidebarContext";
-import Navbar from "../components/Navbar";
 import RequestManagement from "../components/RequestManagement";
-import UserProfileUpdateDialog from "../components/UserProfileUpdateDialog";
 import axios from "../api/axios";
 import { useAuth } from "../contexts/AuthContext";
 import StatCard from "../components/StatCard";
@@ -168,7 +176,11 @@ const AdminDashboard = () => {
     },
     { id: "Pending Requests", text: "Pending Requests", icon: <PendingIcon /> },
     // Pro Plan menu item
-    { id: "pro-plan", text: "Subscribe Plan", icon: <StarIcon color="warning" /> },
+    {
+      id: "pro-plan",
+      text: "Subscribe Plan",
+      icon: <StarIcon color="warning" />,
+    },
   ];
 
   // Section header text
@@ -195,74 +207,182 @@ const AdminDashboard = () => {
               sx={{
                 p: { xs: 2, sm: 3 },
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #ffffff, #f5f5f5)'
+                background: "linear-gradient(135deg, #ffffff, #f5f5f5)",
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
-                   Dashboard Overview
-                 </Typography>
-                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                   <Chip
-                     label={`Last updated: ${new Date().toLocaleTimeString()}`}
-                     size="small"
-                     color="primary"
-                     variant="outlined"
-                   />
-                   <IconButton
-                     size="small"
-                     color="primary"
-                     onClick={() => {
-                       setLoading(true);
-                       // Fetch requests again
-                       const fetchRequests = async () => {
-                         try {
-                           let res;
-                           if (user?.role === "user") {
-                             res = await axios.get("/api/user-requests/user-requests");
-                           } else if (user?.role === "admin") {
-                             res = await axios.get("/api/user-requests/admin-requests");
-                           }
-                           setTotalAdminRequest(Array.isArray(res?.data) ? res.data : []);
-                           setTotalUserPendingRequest(
-                             Array.isArray(res?.data)
-                               ? res.data.filter((req) => req.status === "pending")
-                               : []
-                           );
-                           setTotalUserCompletedRequest(
-                             Array.isArray(res?.data)
-                               ? res.data.filter((req) => req.status === "completed")
-                               : []
-                           );
-                           setUserApprovedRequest(
-                             res?.data?.filter((req) => req.status === "approved")
-                           );
-                         } catch (err) {
-                           setError("Failed to refresh data.");
-                         } finally {
-                           setLoading(false);
-                         }
-                       };
-                       if (user?.role === "user" || user?.role === "admin") fetchRequests();
-                     }}
-                     sx={{ ml: 1 }}
-                   >
-                     <RefreshIcon fontSize="small" />
-                   </IconButton>
-                 </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h5"
+                  sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+                >
+                  Dashboard Overview
+                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Chip
+                    label={`Last updated: ${new Date().toLocaleTimeString()}`}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                  <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => {
+                      setLoading(true);
+                      // Fetch requests again
+                      const fetchRequests = async () => {
+                        try {
+                          let res;
+                          if (user?.role === "user") {
+                            res = await axios.get(
+                              "/api/user-requests/user-requests"
+                            );
+                          } else if (user?.role === "admin") {
+                            res = await axios.get(
+                              "/api/user-requests/admin-requests"
+                            );
+                          }
+                          setTotalAdminRequest(
+                            Array.isArray(res?.data) ? res.data : []
+                          );
+                          setTotalUserPendingRequest(
+                            Array.isArray(res?.data)
+                              ? res.data.filter(
+                                  (req) => req.status === "pending"
+                                )
+                              : []
+                          );
+                          setTotalUserCompletedRequest(
+                            Array.isArray(res?.data)
+                              ? res.data.filter(
+                                  (req) => req.status === "completed"
+                                )
+                              : []
+                          );
+                          setUserApprovedRequest(
+                            res?.data?.filter(
+                              (req) => req.status === "approved"
+                            )
+                          );
+                        } catch (err) {
+                          setError("Failed to refresh data.");
+                        } finally {
+                          setLoading(false);
+                        }
+                      };
+                      if (user?.role === "user" || user?.role === "admin")
+                        fetchRequests();
+                    }}
+                    sx={{ ml: 1 }}
+                  >
+                    <RefreshIcon fontSize="small" />
+                  </IconButton>
+                </Box>
               </Box>
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
-                Welcome back! Here's a summary of all service requests and their current status. You have
-                <Box component="span" sx={{ fontWeight: 'bold', color: theme.palette.warning.main }}> {loading ? "..." : totalUserPendingRequest.length} pending</Box> and
-                <Box component="span" sx={{ fontWeight: 'bold', color: theme.palette.success.main }}> {loading ? "..." : totalUserCompletedRequest.length} completed</Box> requests.
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 2,
+                  color: "text.secondary",
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                }}
+              >
+                Welcome back! Here's a summary of all service requests and their
+                current status. You have
+                <Box
+                  component="span"
+                  sx={{ fontWeight: "bold", color: theme.palette.warning.main }}
+                >
+                  {" "}
+                  {loading ? "..." : totalUserPendingRequest.length} pending
+                </Box>{" "}
+                and
+                <Box
+                  component="span"
+                  sx={{ fontWeight: "bold", color: theme.palette.success.main }}
+                >
+                  {" "}
+                  {loading ? "..." : totalUserCompletedRequest.length} completed
+                </Box>{" "}
+                requests.
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 } }}>
-                <Chip size="small" label={`Total: ${loading ? "..." : totalAdminRequest.length}`} color="default" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5 }} />
-                <Chip size="small" label={`Pending: ${loading ? "..." : totalUserPendingRequest.length}`} color="warning" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5 }} />
-                <Chip size="small" label={`In Progress: ${loading ? "..." : totalAdminRequest.filter(req => req.status === 'in_progress').length}`} color="info" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5, display: { xs: 'none', md: 'flex' } }} />
-                <Chip size="small" label={`Completed: ${loading ? "..." : totalUserCompletedRequest.length}`} color="success" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5 }} />
-                <Chip size="small" label={`Approved: ${loading ? "..." : userApprovedRequest.length}`} color="primary" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5, display: { xs: 'none', md: 'flex' } }} />
-                <Chip size="small" label={`Rejected: ${loading ? "..." : totalAdminRequest.filter(req => req.status === 'rejected').length}`} color="error" sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' }, height: { xs: 24, sm: 32 }, m: 0.5, display: { xs: 'none', md: 'flex' } }} />
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: { xs: 0.5, sm: 1 },
+                }}
+              >
+                <Chip
+                  size="small"
+                  label={`Total: ${loading ? "..." : totalAdminRequest.length}`}
+                  color="default"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label={`Pending: ${loading ? "..." : totalUserPendingRequest.length}`}
+                  color="warning"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label={`In Progress: ${loading ? "..." : totalAdminRequest.filter((req) => req.status === "in_progress").length}`}
+                  color="info"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                    display: { xs: "none", md: "flex" },
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label={`Completed: ${loading ? "..." : totalUserCompletedRequest.length}`}
+                  color="success"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label={`Approved: ${loading ? "..." : userApprovedRequest.length}`}
+                  color="primary"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                    display: { xs: "none", md: "flex" },
+                  }}
+                />
+                <Chip
+                  size="small"
+                  label={`Rejected: ${loading ? "..." : totalAdminRequest.filter((req) => req.status === "rejected").length}`}
+                  color="error"
+                  sx={{
+                    fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                    height: { xs: 24, sm: 32 },
+                    m: 0.5,
+                    display: { xs: "none", md: "flex" },
+                  }}
+                />
               </Box>
             </Paper>
 
@@ -312,20 +432,26 @@ const AdminDashboard = () => {
             </Grid>
 
             {/* Charts Row */}
-            <Grid container spacing={3} sx={{ mt: 2 }}>
+            <Grid container spacing={3} sx={{ mt: 2 }} display="block">
               {/* Request Status Distribution (Pie Chart) */}
-              <Grid item xs={12} md={6} lg={4}>
+              <Grid item xs={12} md={6} lg={4} paddingBottom={5}>
                 <Paper
                   elevation={4}
                   sx={{
                     p: 3,
                     borderRadius: 3,
-                    height: '100%',
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)',
-                    boxShadow: '0 4px 24px 0 rgba(60,72,100,0.08)'
+                    height: 400, // fixed height
+                    background:
+                      "linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)",
+                    boxShadow: "0 4px 24px 0 rgba(60,72,100,0.08)",
                   }}
                 >
-                  <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    mb={2}
+                  >
                     <Typography variant="h6" fontWeight="bold" color="primary">
                       Request Status Distribution
                     </Typography>
@@ -336,9 +462,14 @@ const AdminDashboard = () => {
                       variant="outlined"
                     />
                   </Box>
-                  <Box sx={{ height: { xs: 220, sm: 260, md: 300 } }}>
+                  <Box sx={{ height: "85%" }}>
                     {loading ? (
-                      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        height="100%"
+                      >
                         <CircularProgress size={40} />
                       </Box>
                     ) : (
@@ -346,27 +477,53 @@ const AdminDashboard = () => {
                         <PieChart>
                           <Pie
                             data={[
-                              { name: 'Pending', value: totalUserPendingRequest.length, fill: '#FF9800' },
-                              { name: 'Completed', value: totalUserCompletedRequest.length, fill: '#4CAF50' },
-                              { name: 'Approved', value: userApprovedRequest.length, fill: '#2196F3' },
-                              { name: 'In Progress', value: totalAdminRequest.filter(req => req.status === 'in_progress').length, fill: '#9C27B0' },
-                              { name: 'Rejected', value: totalAdminRequest.filter(req => req.status === 'rejected').length, fill: '#F44336' },
+                              {
+                                name: "Pending",
+                                value: totalUserPendingRequest.length,
+                                fill: "#FF9800",
+                              },
+                              {
+                                name: "Completed",
+                                value: totalUserCompletedRequest.length,
+                                fill: "#4CAF50",
+                              },
+                              {
+                                name: "Approved",
+                                value: userApprovedRequest.length,
+                                fill: "#2196F3",
+                              },
+                              {
+                                name: "In Progress",
+                                value: totalAdminRequest.filter(
+                                  (req) => req.status === "in_progress"
+                                ).length,
+                                fill: "#9C27B0",
+                              },
+                              {
+                                name: "Rejected",
+                                value: totalAdminRequest.filter(
+                                  (req) => req.status === "rejected"
+                                ).length,
+                                fill: "#F44336",
+                              },
                             ]}
                             cx="50%"
                             cy="50%"
                             outerRadius="80%"
                             dataKey="value"
                             label={({ name, percent }) =>
-                              percent > 0.08 ? `${name}: ${(percent * 100).toFixed(0)}%` : ''
+                              percent > 0.08
+                                ? `${name}: ${(percent * 100).toFixed(0)}%`
+                                : ""
                             }
                             isAnimationActive
                           >
                             {[
-                              { fill: '#FF9800' },
-                              { fill: '#4CAF50' },
-                              { fill: '#2196F3' },
-                              { fill: '#9C27B0' },
-                              { fill: '#F44336' },
+                              { fill: "#FF9800" },
+                              { fill: "#4CAF50" },
+                              { fill: "#2196F3" },
+                              { fill: "#9C27B0" },
+                              { fill: "#F44336" },
                             ].map((entry, idx) => (
                               <Cell key={idx} {...entry} />
                             ))}
@@ -386,34 +543,69 @@ const AdminDashboard = () => {
               </Grid>
 
               {/* Request Status Breakdown (Bar Chart) */}
-              <Grid item xs={12} md={6} lg={4}>
+              <Grid item xs={12} md={6} lg={4} paddingBottom={5}>
                 <Paper
                   elevation={4}
                   sx={{
                     p: 3,
                     borderRadius: 3,
-                    height: '100%',
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)',
-                    boxShadow: '0 4px 24px 0 rgba(60,72,100,0.08)'
+                    height: 400,
+                    background:
+                      "linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)",
+                    boxShadow: "0 4px 24px 0 rgba(60,72,100,0.08)",
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold" color="primary" mb={2}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="primary"
+                    mb={2}
+                  >
                     Request Status Breakdown
                   </Typography>
-                  <Box sx={{ height: { xs: 220, sm: 260, md: 300 } }}>
+                  <Box sx={{ height: "85%" }}>
                     {loading ? (
-                      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        height="100%"
+                      >
                         <CircularProgress size={40} />
                       </Box>
                     ) : (
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
                           data={[
-                            { name: 'Pending', value: totalUserPendingRequest.length, fill: '#FF9800' },
-                            { name: 'In Progress', value: totalAdminRequest.filter(req => req.status === 'in_progress').length, fill: '#9C27B0' },
-                            { name: 'Completed', value: totalUserCompletedRequest.length, fill: '#4CAF50' },
-                            { name: 'Approved', value: userApprovedRequest.length, fill: '#2196F3' },
-                            { name: 'Rejected', value: totalAdminRequest.filter(req => req.status === 'rejected').length, fill: '#F44336' },
+                            {
+                              name: "Pending",
+                              value: totalUserPendingRequest.length,
+                              fill: "#FF9800",
+                            },
+                            {
+                              name: "In Progress",
+                              value: totalAdminRequest.filter(
+                                (req) => req.status === "in_progress"
+                              ).length,
+                              fill: "#9C27B0",
+                            },
+                            {
+                              name: "Completed",
+                              value: totalUserCompletedRequest.length,
+                              fill: "#4CAF50",
+                            },
+                            {
+                              name: "Approved",
+                              value: userApprovedRequest.length,
+                              fill: "#2196F3",
+                            },
+                            {
+                              name: "Rejected",
+                              value: totalAdminRequest.filter(
+                                (req) => req.status === "rejected"
+                              ).length,
+                              fill: "#F44336",
+                            },
                           ]}
                           margin={{ top: 10, right: 20, left: 10, bottom: 30 }}
                           barSize={32}
@@ -423,13 +615,17 @@ const AdminDashboard = () => {
                           <YAxis tick={{ fontSize: 12 }} />
                           <Tooltip />
                           <Legend wrapperStyle={{ fontSize: 13 }} />
-                          <Bar dataKey="value" name="Requests" isAnimationActive>
+                          <Bar
+                            dataKey="value"
+                            name="Requests"
+                            isAnimationActive
+                          >
                             {[
-                              { fill: '#FF9800' },
-                              { fill: '#9C27B0' },
-                              { fill: '#4CAF50' },
-                              { fill: '#2196F3' },
-                              { fill: '#F44336' },
+                              { fill: "#FF9800" },
+                              { fill: "#9C27B0" },
+                              { fill: "#4CAF50" },
+                              { fill: "#2196F3" },
+                              { fill: "#F44336" },
                             ].map((entry, idx) => (
                               <Cell key={idx} {...entry} />
                             ))}
@@ -442,23 +638,35 @@ const AdminDashboard = () => {
               </Grid>
 
               {/* Request Timeline (Vertical Bar Chart) */}
-              <Grid item xs={12} lg={4}>
+              <Grid item xs={12} md={12} lg={4}>
                 <Paper
                   elevation={4}
                   sx={{
                     p: 3,
                     borderRadius: 3,
-                    height: '100%',
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)',
-                    boxShadow: '0 4px 24px 0 rgba(60,72,100,0.08)'
+                    height: 600,
+                    width: "100%",
+                    background:
+                      "linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%)",
+                    boxShadow: "0 4px 24px 0 rgba(60,72,100,0.08)",
                   }}
                 >
-                  <Typography variant="h6" fontWeight="bold" color="primary" mb={2}>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="primary"
+                    mb={2}
+                  >
                     Request Timeline
                   </Typography>
-                  <Box sx={{ height: { xs: 240, sm: 280, md: 320 } }}>
+                  <Box sx={{ height: "85%" }}>
                     {loading ? (
-                      <Box display="flex" alignItems="center" justifyContent="center" height="100%">
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                        height="100%"
+                      >
                         <CircularProgress size={40} />
                       </Box>
                     ) : (
@@ -467,46 +675,62 @@ const AdminDashboard = () => {
                           layout="vertical"
                           data={[
                             {
-                              name: 'Last 24 Hours',
-                              value: totalAdminRequest.filter(req =>
-                                new Date(req.createdAt) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+                              name: "Last 24 Hours",
+                              value: totalAdminRequest.filter(
+                                (req) =>
+                                  new Date(req.createdAt) >
+                                  new Date(Date.now() - 24 * 60 * 60 * 1000)
                               ).length,
-                              fill: '#2196F3'
+                              fill: "#2196F3",
                             },
                             {
-                              name: 'Last Week',
-                              value: totalAdminRequest.filter(req =>
-                                new Date(req.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                              name: "Last Week",
+                              value: totalAdminRequest.filter(
+                                (req) =>
+                                  new Date(req.createdAt) >
+                                  new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                               ).length,
-                              fill: '#4CAF50'
+                              fill: "#4CAF50",
                             },
                             {
-                              name: 'Last Month',
-                              value: totalAdminRequest.filter(req =>
-                                new Date(req.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                              name: "Last Month",
+                              value: totalAdminRequest.filter(
+                                (req) =>
+                                  new Date(req.createdAt) >
+                                  new Date(
+                                    Date.now() - 30 * 24 * 60 * 60 * 1000
+                                  )
                               ).length,
-                              fill: '#FF9800'
+                              fill: "#FF9800",
                             },
                             {
-                              name: 'All Time',
+                              name: "All Time",
                               value: totalAdminRequest.length,
-                              fill: '#9C27B0'
-                            }
+                              fill: "#9C27B0",
+                            },
                           ]}
                           margin={{ top: 10, right: 30, left: 80, bottom: 10 }}
                           barSize={28}
                         >
                           <CartesianGrid strokeDasharray="3 3" />
                           <XAxis type="number" />
-                          <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} />
+                          <YAxis
+                            dataKey="name"
+                            type="category"
+                            tick={{ fontSize: 12 }}
+                          />
                           <Tooltip />
                           <Legend wrapperStyle={{ fontSize: 13 }} />
-                          <Bar dataKey="value" name="Requests" isAnimationActive>
+                          <Bar
+                            dataKey="value"
+                            name="Requests"
+                            isAnimationActive
+                          >
                             {[
-                              { fill: '#2196F3' },
-                              { fill: '#4CAF50' },
-                              { fill: '#FF9800' },
-                              { fill: '#9C27B0' }
+                              { fill: "#2196F3" },
+                              { fill: "#4CAF50" },
+                              { fill: "#FF9800" },
+                              { fill: "#9C27B0" },
                             ].map((entry, idx) => (
                               <Cell key={idx} {...entry} />
                             ))}
@@ -525,209 +749,485 @@ const AdminDashboard = () => {
               sx={{
                 p: 3,
                 borderRadius: 2,
-                background: 'linear-gradient(135deg, #ffffff, #f5f5f5)'
+                background: "linear-gradient(135deg, #ffffff, #f5f5f5)",
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 2,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", color: theme.palette.primary.main }}
+                >
                   Recent Requests
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 }, alignItems: 'center' }}>
-                   <FilterListIcon fontSize="small" color="action" sx={{ mr: 1 }} />
-                   <Button
-                     size="small"
-                     variant={!statusFilter ? "contained" : "outlined"}
-                     onClick={() => setStatusFilter(null)}
-                     title="Show all requests"
-                     sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' }, py: { xs: 0.5, sm: 0.75 }, px: { xs: 1, sm: 2 } }}
-                   >
-                     All
-                   </Button>
-                   <Button
-                     size="small"
-                     variant={statusFilter === 'pending' ? "contained" : "outlined"}
-                     color="warning"
-                     onClick={() => setStatusFilter('pending')}
-                     title="Show only pending requests"
-                     sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' }, py: { xs: 0.5, sm: 0.75 }, px: { xs: 1, sm: 2 } }}
-                   >
-                     Pending
-                     {totalAdminRequest.filter(req => req.status === 'pending').length > 0 && (
-                       <Box component="span" sx={{ ml: 0.5, fontSize: { xs: '0.65rem', sm: '0.75rem' }, bgcolor: 'warning.main', color: 'white', borderRadius: '50%', width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 }, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                         {totalAdminRequest.filter(req => req.status === 'pending').length}
-                       </Box>
-                     )}
-                   </Button>
-                   <Button
-                     size="small"
-                     variant={statusFilter === 'in_progress' ? "contained" : "outlined"}
-                     color="info"
-                     onClick={() => setStatusFilter('in_progress')}
-                     title="Show only in-progress requests"
-                     sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' }, py: { xs: 0.5, sm: 0.75 }, px: { xs: 1, sm: 2 } }}
-                   >
-                     {isSmallScreen ? 'In Prog.' : 'In Progress'}
-                     {totalAdminRequest.filter(req => req.status === 'in_progress').length > 0 && (
-                       <Box component="span" sx={{ ml: 0.5, fontSize: { xs: '0.65rem', sm: '0.75rem' }, bgcolor: 'info.main', color: 'white', borderRadius: '50%', width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 }, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                         {totalAdminRequest.filter(req => req.status === 'in_progress').length}
-                       </Box>
-                     )}
-                   </Button>
-                   <Button
-                     size="small"
-                     variant={statusFilter === 'completed' ? "contained" : "outlined"}
-                     color="success"
-                     onClick={() => setStatusFilter('completed')}
-                     title="Show only completed requests"
-                     sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' }, py: { xs: 0.5, sm: 0.75 }, px: { xs: 1, sm: 2 } }}
-                   >
-                     Completed
-                     {totalAdminRequest.filter(req => req.status === 'completed').length > 0 && (
-                       <Box component="span" sx={{ ml: 0.5, fontSize: { xs: '0.65rem', sm: '0.75rem' }, bgcolor: 'success.main', color: 'white', borderRadius: '50%', width: { xs: 16, sm: 18 }, height: { xs: 16, sm: 18 }, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                         {totalAdminRequest.filter(req => req.status === 'completed').length}
-                       </Box>
-                     )}
-                   </Button>
-                 </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: { xs: 0.5, sm: 1 },
+                    alignItems: "center",
+                  }}
+                >
+                  <FilterListIcon
+                    fontSize="small"
+                    color="action"
+                    sx={{ mr: 1 }}
+                  />
+                  <Button
+                    size="small"
+                    variant={!statusFilter ? "contained" : "outlined"}
+                    onClick={() => setStatusFilter(null)}
+                    title="Show all requests"
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      px: { xs: 1, sm: 2 },
+                    }}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={
+                      statusFilter === "pending" ? "contained" : "outlined"
+                    }
+                    color="warning"
+                    onClick={() => setStatusFilter("pending")}
+                    title="Show only pending requests"
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      px: { xs: 1, sm: 2 },
+                    }}
+                  >
+                    Pending
+                    {totalAdminRequest.filter((req) => req.status === "pending")
+                      .length > 0 && (
+                      <Box
+                        component="span"
+                        sx={{
+                          ml: 0.5,
+                          fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                          bgcolor: "warning.main",
+                          color: "white",
+                          borderRadius: "50%",
+                          width: { xs: 16, sm: 18 },
+                          height: { xs: 16, sm: 18 },
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {
+                          totalAdminRequest.filter(
+                            (req) => req.status === "pending"
+                          ).length
+                        }
+                      </Box>
+                    )}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={
+                      statusFilter === "in_progress" ? "contained" : "outlined"
+                    }
+                    color="info"
+                    onClick={() => setStatusFilter("in_progress")}
+                    title="Show only in-progress requests"
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      px: { xs: 1, sm: 2 },
+                    }}
+                  >
+                    {isSmallScreen ? "In Prog." : "In Progress"}
+                    {totalAdminRequest.filter(
+                      (req) => req.status === "in_progress"
+                    ).length > 0 && (
+                      <Box
+                        component="span"
+                        sx={{
+                          ml: 0.5,
+                          fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                          bgcolor: "info.main",
+                          color: "white",
+                          borderRadius: "50%",
+                          width: { xs: 16, sm: 18 },
+                          height: { xs: 16, sm: 18 },
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {
+                          totalAdminRequest.filter(
+                            (req) => req.status === "in_progress"
+                          ).length
+                        }
+                      </Box>
+                    )}
+                  </Button>
+                  <Button
+                    size="small"
+                    variant={
+                      statusFilter === "completed" ? "contained" : "outlined"
+                    }
+                    color="success"
+                    onClick={() => setStatusFilter("completed")}
+                    title="Show only completed requests"
+                    sx={{
+                      fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                      py: { xs: 0.5, sm: 0.75 },
+                      px: { xs: 1, sm: 2 },
+                    }}
+                  >
+                    Completed
+                    {totalAdminRequest.filter(
+                      (req) => req.status === "completed"
+                    ).length > 0 && (
+                      <Box
+                        component="span"
+                        sx={{
+                          ml: 0.5,
+                          fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                          bgcolor: "success.main",
+                          color: "white",
+                          borderRadius: "50%",
+                          width: { xs: 16, sm: 18 },
+                          height: { xs: 16, sm: 18 },
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {
+                          totalAdminRequest.filter(
+                            (req) => req.status === "completed"
+                          ).length
+                        }
+                      </Box>
+                    )}
+                  </Button>
+                </Box>
               </Box>
               {loading ? (
-                <Box display="flex" alignItems="center" justifyContent="center" p={4}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  p={4}
+                >
                   <CircularProgress size={40} />
                 </Box>
               ) : totalAdminRequest.length === 0 ? (
                 <Alert severity="info" sx={{ mt: 2 }}>
                   No requests found.
                 </Alert>
-              ) : totalAdminRequest.filter(request => statusFilter ? request.status === statusFilter : true).length === 0 ? (
+              ) : totalAdminRequest.filter((request) =>
+                  statusFilter ? request.status === statusFilter : true
+                ).length === 0 ? (
                 <Alert severity="info" sx={{ mt: 2 }}>
-                  No {statusFilter} requests found. <Button size="small" onClick={() => setStatusFilter(null)}>View all requests</Button>
+                  No {statusFilter} requests found.{" "}
+                  <Button size="small" onClick={() => setStatusFilter(null)}>
+                    View all requests
+                  </Button>
                 </Alert>
               ) : (
-                <TableContainer component={Paper} sx={{ mt: 2, boxShadow: 'none', overflowX: 'auto' }}>
+                <TableContainer
+                  component={Paper}
+                  sx={{ mt: 2, boxShadow: "none", overflowX: "auto" }}
+                >
                   <Table sx={{ minWidth: { xs: 300, sm: 500, md: 650 } }}>
                     <TableHead>
-                        <TableRow sx={{ backgroundColor: theme.palette.primary.main }}>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold', padding: { xs: 1, sm: 2 }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>User</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold', padding: { xs: 1, sm: 2 }, fontSize: { xs: '0.75rem', sm: '0.875rem' }, display: { xs: 'none', sm: 'table-cell' } }}>Service Details</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold', padding: { xs: 1, sm: 2 }, fontSize: { xs: '0.75rem', sm: '0.875rem' }, display: { xs: 'none', md: 'table-cell' } }}>Request Date</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold', padding: { xs: 1, sm: 2 }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Status</TableCell>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold', padding: { xs: 1, sm: 2 }, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Action</TableCell>
-                        </TableRow>
-                      </TableHead>
+                      <TableRow
+                        sx={{ backgroundColor: theme.palette.primary.main }}
+                      >
+                        <TableCell
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: { xs: 1, sm: 2 },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          }}
+                        >
+                          User
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: { xs: 1, sm: 2 },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                            display: { xs: "none", sm: "table-cell" },
+                          }}
+                        >
+                          Service Details
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: { xs: 1, sm: 2 },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                            display: { xs: "none", md: "table-cell" },
+                          }}
+                        >
+                          Request Date
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: { xs: 1, sm: 2 },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          }}
+                        >
+                          Status
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            color: "white",
+                            fontWeight: "bold",
+                            padding: { xs: 1, sm: 2 },
+                            fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                          }}
+                        >
+                          Action
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
                     <TableBody>
                       {totalAdminRequest
-                        .filter(request => statusFilter ? request.status === statusFilter : true)
+                        .filter((request) =>
+                          statusFilter ? request.status === statusFilter : true
+                        )
                         .slice(0, 5)
                         .map((request) => (
-                        <TableRow key={request._id} hover sx={{ '&:hover': { backgroundColor: theme.palette.action.hover } }}>
-                          <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                              <Box sx={{
-                                width: { xs: 28, sm: 35 },
-                                height: { xs: 28, sm: 35 },
-                                borderRadius: '50%',
-                                bgcolor: theme.palette.primary.light,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                mr: 1,
-                                fontSize: { xs: '0.7rem', sm: '0.875rem' }
-                              }}>
-                                {(request.user?.name?.charAt(0) || request.userName?.charAt(0) || 'U').toUpperCase()}
-                              </Box>
-                              <Box>
-                                <Typography variant="body2" sx={{ fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
-                                  {request.user?.name || request.userName || 'Unknown User'}
-                                </Typography>
-                                {request.user?.email && (
-                                  <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>
-                                    {request.user.email}
+                          <TableRow
+                            key={request._id}
+                            hover
+                            sx={{
+                              "&:hover": {
+                                backgroundColor: theme.palette.action.hover,
+                              },
+                            }}
+                          >
+                            <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
+                              <Box
+                                sx={{ display: "flex", alignItems: "center" }}
+                              >
+                                <Box
+                                  sx={{
+                                    width: { xs: 28, sm: 35 },
+                                    height: { xs: 28, sm: 35 },
+                                    borderRadius: "50%",
+                                    bgcolor: theme.palette.primary.light,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "white",
+                                    fontWeight: "bold",
+                                    mr: 1,
+                                    fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                                  }}
+                                >
+                                  {(
+                                    request.user?.name?.charAt(0) ||
+                                    request.userName?.charAt(0) ||
+                                    "U"
+                                  ).toUpperCase()}
+                                </Box>
+                                <Box>
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
+                                      fontWeight: "medium",
+                                      fontSize: {
+                                        xs: "0.7rem",
+                                        sm: "0.875rem",
+                                      },
+                                    }}
+                                  >
+                                    {request.user?.name ||
+                                      request.userName ||
+                                      "Unknown User"}
                                   </Typography>
-                                )}
+                                  {request.user?.email && (
+                                    <Typography
+                                      variant="caption"
+                                      display="block"
+                                      color="text.secondary"
+                                      sx={{
+                                        fontSize: {
+                                          xs: "0.6rem",
+                                          sm: "0.75rem",
+                                        },
+                                      }}
+                                    >
+                                      {request.user.email}
+                                    </Typography>
+                                  )}
+                                </Box>
                               </Box>
-                            </Box>
-                          </TableCell>
-                          <TableCell sx={{ padding: { xs: 1, sm: 2 }, display: { xs: 'none', sm: 'table-cell' } }}>
-                            <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
-                              {request.title || request.serviceType || 'General Service'}
-                            </Typography>
-                            {request.description && (
-                              <Typography variant="caption" display="block" color="text.secondary" sx={{ maxWidth: { xs: 100, sm: 200 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>
-                                {request.description}
-                              </Typography>
-                            )}
-                          </TableCell>
-                          <TableCell sx={{ padding: { xs: 1, sm: 2 }, display: { xs: 'none', md: 'table-cell' } }}>
-                            <Typography variant="body2" sx={{ fontSize: { xs: '0.7rem', sm: '0.875rem' } }}>
-                              {new Date(request.createdAt).toLocaleDateString()}
-                            </Typography>
-                            <Typography variant="caption" display="block" color="text.secondary" sx={{ fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>
-                              {new Date(request.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                            </Typography>
-                          </TableCell>
-                          <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
-                            <Chip
-                              label={request.status.charAt(0).toUpperCase() + request.status.slice(1).replace('_', ' ')}
-                              size="small"
+                            </TableCell>
+                            <TableCell
                               sx={{
-                                fontWeight: 'medium',
-                                minWidth: { xs: 65, sm: 85 },
-                                height: { xs: 22, sm: 28 },
-                                textAlign: 'center',
-                                fontSize: { xs: '0.6rem', sm: '0.75rem' }
-                              }}
-                              color={
-                                request.status === 'completed' ? 'success' :
-                                request.status === 'pending' ? 'warning' :
-                                request.status === 'approved' ? 'primary' :
-                                request.status === 'in_progress' ? 'info' :
-                                request.status === 'rejected' ? 'error' : 'default'
-                              }
-                            />
-                          </TableCell>
-                          <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              startIcon={<Visibility sx={{ fontSize: { xs: '0.8rem', sm: '1rem' } }} />}
-                              onClick={() => {
-                                setActiveSection("requests");
-                                // Store the selected request ID in sessionStorage for highlighting
-                                sessionStorage.setItem('selectedRequestId', request._id);
-                              }}
-                              sx={{
-                                fontSize: { xs: '0.6rem', sm: '0.75rem' },
-                                padding: { xs: '1px 6px', sm: '4px 10px' },
-                                minWidth: { xs: 55, sm: 70 }
+                                padding: { xs: 1, sm: 2 },
+                                display: { xs: "none", sm: "table-cell" },
                               }}
                             >
-                              View
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                                }}
+                              >
+                                {request.title ||
+                                  request.serviceType ||
+                                  "General Service"}
+                              </Typography>
+                              {request.description && (
+                                <Typography
+                                  variant="caption"
+                                  display="block"
+                                  color="text.secondary"
+                                  sx={{
+                                    maxWidth: { xs: 100, sm: 200 },
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    whiteSpace: "nowrap",
+                                    fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                                  }}
+                                >
+                                  {request.description}
+                                </Typography>
+                              )}
+                            </TableCell>
+                            <TableCell
+                              sx={{
+                                padding: { xs: 1, sm: 2 },
+                                display: { xs: "none", md: "table-cell" },
+                              }}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontSize: { xs: "0.7rem", sm: "0.875rem" },
+                                }}
+                              >
+                                {new Date(
+                                  request.createdAt
+                                ).toLocaleDateString()}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                display="block"
+                                color="text.secondary"
+                                sx={{
+                                  fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                                }}
+                              >
+                                {new Date(request.createdAt).toLocaleTimeString(
+                                  [],
+                                  { hour: "2-digit", minute: "2-digit" }
+                                )}
+                              </Typography>
+                            </TableCell>
+                            <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
+                              <Chip
+                                label={
+                                  request.status.charAt(0).toUpperCase() +
+                                  request.status.slice(1).replace("_", " ")
+                                }
+                                size="small"
+                                sx={{
+                                  fontWeight: "medium",
+                                  minWidth: { xs: 65, sm: 85 },
+                                  height: { xs: 22, sm: 28 },
+                                  textAlign: "center",
+                                  fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                                }}
+                                color={
+                                  request.status === "completed"
+                                    ? "success"
+                                    : request.status === "pending"
+                                      ? "warning"
+                                      : request.status === "approved"
+                                        ? "primary"
+                                        : request.status === "in_progress"
+                                          ? "info"
+                                          : request.status === "rejected"
+                                            ? "error"
+                                            : "default"
+                                }
+                              />
+                            </TableCell>
+                            <TableCell sx={{ padding: { xs: 1, sm: 2 } }}>
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={
+                                  <Visibility
+                                    sx={{
+                                      fontSize: { xs: "0.8rem", sm: "1rem" },
+                                    }}
+                                  />
+                                }
+                                onClick={() => {
+                                  setActiveSection("requests");
+                                  // Store the selected request ID in sessionStorage for highlighting
+                                  sessionStorage.setItem(
+                                    "selectedRequestId",
+                                    request._id
+                                  );
+                                }}
+                                sx={{
+                                  fontSize: { xs: "0.6rem", sm: "0.75rem" },
+                                  padding: { xs: "1px 6px", sm: "4px 10px" },
+                                  minWidth: { xs: 55, sm: 70 },
+                                }}
+                              >
+                                View
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
               )}
-              {totalAdminRequest.filter(request => statusFilter ? request.status === statusFilter : true).length > 5 && (
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+              {totalAdminRequest.filter((request) =>
+                statusFilter ? request.status === statusFilter : true
+              ).length > 5 && (
+                <Box sx={{ mt: 2, display: "flex", justifyContent: "center" }}>
                   <Button
                     variant="text"
                     onClick={() => {
                       setActiveSection("requests");
                       // Store the current filter in sessionStorage
                       if (statusFilter) {
-                        sessionStorage.setItem('requestStatusFilter', statusFilter);
+                        sessionStorage.setItem(
+                          "requestStatusFilter",
+                          statusFilter
+                        );
                       } else {
-                        sessionStorage.removeItem('requestStatusFilter');
+                        sessionStorage.removeItem("requestStatusFilter");
                       }
                     }}
                     endIcon={<ChevronRightIcon />}
                   >
-                    View All {statusFilter ? statusFilter.charAt(0).toUpperCase() + statusFilter.slice(1) : ''} Requests
+                    View All{" "}
+                    {statusFilter
+                      ? statusFilter.charAt(0).toUpperCase() +
+                        statusFilter.slice(1)
+                      : ""}{" "}
+                    Requests
                   </Button>
                 </Box>
               )}
@@ -888,7 +1388,7 @@ const AdminDashboard = () => {
                   transition: "opacity 0.2s ease-in-out",
                   "& .MuiListItemText-primary": {
                     fontWeight: activeSection === item.id ? "bold" : "normal",
-                    fontSize: { xs: '0.8rem', sm: '0.9rem' }
+                    fontSize: { xs: "0.8rem", sm: "0.9rem" },
                   },
                 }}
               />
@@ -942,7 +1442,7 @@ const AdminDashboard = () => {
               sx={{
                 fontWeight: "bold",
                 color: theme.palette.primary.main,
-                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
               }}
             >
               {sectionTitle}
@@ -969,7 +1469,11 @@ const AdminDashboard = () => {
             },
           }}
         >
-          {sidebarOpen ? <ChevronLeftIcon sx={{ fontSize: { xs: 20, sm: 24 } }} /> : <MenuIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />}
+          {sidebarOpen ? (
+            <ChevronLeftIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          ) : (
+            <MenuIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          )}
         </Fab>
       )}
     </Box>
