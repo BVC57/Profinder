@@ -1028,7 +1028,7 @@ const RequestManagement = () => {
                   onChange={(e) =>
                     setActionForm((f) => ({ ...f, startDate: e.target.value }))
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mt:2  }}
                   InputLabelProps={{ shrink: true }}
                 />
                 <TextField
@@ -1039,7 +1039,7 @@ const RequestManagement = () => {
                   onChange={(e) =>
                     setActionForm((f) => ({ ...f, endDate: e.target.value }))
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mt:2  }}
                   InputLabelProps={{ shrink: true }}
                 />
                 <TextField
@@ -1076,7 +1076,7 @@ const RequestManagement = () => {
                   onChange={(e) =>
                     setActionForm((f) => ({ ...f, status: e.target.value }))
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mt:2 }}
                 >
                   {actionDialog.request.status === "approved" && (
                     <MenuItem value="in_progress">In Progress</MenuItem>

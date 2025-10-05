@@ -47,7 +47,7 @@ const paymentSchema = new mongoose.Schema({
   },
   paymentType: {
     type: String,
-    enum: ['ServiceRequest', 'VerificationFee', 'Other', 'ProPlanUpgrade'],
+    enum: ['ServiceRequest', 'VerificationFee', 'Other', 'ProPlanUpgrade', 'ProPlan'],
     default: 'ServiceRequest',
   },
   description: {

@@ -413,13 +413,43 @@ router.get('/payments/mine', auth, async (req, res) => {
 router.get('/payments/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    
-    const payments = await Payment.find({ userId })
-      .populate('adminId', 'profession city')
-      .populate('requestId', 'title description status')
-      .sort({ createdAt: -1 });
+    const mongoose = require('mongoose');
 
-    res.status(200).json({ success: true, payments });
+    // validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid userId' });
+    }
+
+    // populate adminId -> (populate its userId for admin name/email), userId and requestId
+    const payments = await Payment.find({ userId })
+      .populate([
+        { 
+          path: 'adminId', 
+          populate: { path: 'userId', select: 'name email profilePhoto' },
+          select: 'profession city profilePhoto userId name email'
+        },
+        { path: 'userId', select: 'name email profilePhoto' },
+        { path: 'requestId', select: 'title description status' }
+      ])
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // normalize response: ensure adminName and adminDetails are available
+    const normalized = payments.map(p => {
+      const adminUser = p.adminId?.userId;
+      const adminNameFromProfile = p.adminId?.name || adminUser?.name || p.adminName || null;
+      const adminEmailFromProfile = adminUser?.email || p.adminEmail || null;
+
+      return {
+        ...p,
+        adminName: adminNameFromProfile,
+        adminEmail: adminEmailFromProfile,
+        adminDetails: p.adminId || null, // full populated admin profile (may include userId)
+        userDetails: p.userId || null,
+      };
+    });
+
+    res.status(200).json({ success: true, payments: normalized });
   } catch (error) {
     console.error("❌ User payments fetch error:", error);
     res.status(500).json({ success: false, message: "Error fetching user payments", error });

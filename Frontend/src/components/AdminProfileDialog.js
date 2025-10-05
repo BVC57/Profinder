@@ -162,6 +162,21 @@ import React, { useState, useEffect } from "react";
       setPaymentDone(true);
       setPaymentLoading(true);
       
+      // prepare consistent payment record
+      const paymentRecordBase = {
+        adminId: admin?._id || admin?.id || null,
+        adminName: admin?.name || "Unknown",
+        adminProfession: admin?.profession || "Professional",
+        amount: 500, // amount in paise or as your backend expects
+        currency: 'INR',
+        status: 'success',
+        paymentDate: new Date().toISOString(),
+        paymentDetails: typeof paymentDetails === 'string' ? paymentDetails : JSON.stringify(paymentDetails),
+        userId: user?._id || user?.id || null,
+        userName: user?.name || '',
+        userEmail: user?.email || ''
+      };
+
       try {
         // Create the actual request in the database
         const response = await axios.post('/api/user-requests/create', {
@@ -175,22 +190,11 @@ import React, { useState, useEffect } from "react";
           paymentStatus: 'completed'
         });
 
+        // attach requestId when available
+        const paymentRecord = { ...paymentRecordBase, requestId: response.data?.request?._id || null };
+
         // Save payment history directly to the backend
-        await axios.post('/api/admin/savepayments', {
-          adminId: admin._id,
-          adminName: admin.name || 'Unknown',
-          adminProfession: admin.profession || 'Professional',
-          serviceType: requestData.serviceType,
-          description: requestData.description,
-          preferredDate: requestData.preferredDate,
-          preferredTime: requestData.preferredTime,
-          amount: 500, // 5 Rs in paise
-          status: 'success',
-          paymentDate: new Date().toISOString(),
-          paymentDetails: paymentDetails,
-          requestId: response.data.request._id, // Link to the created request
-          userId: user.id // Add the user ID for filtering
-        });
+        await axios.post('/api/admin/savepayments', paymentRecord);
         
         // Show success message
         setSuccessMessage("Payment successful! Your service request has been submitted and will appear in your requests list.");
@@ -205,23 +209,16 @@ import React, { useState, useEffect } from "react";
         setActiveStep(0);
       } catch (error) {
         console.error('Error creating request:', error);
-        // Even if request creation fails, save payment record directly to the backend
+
+        // even if request creation fails, send payment record (include error note)
         try {
-          await axios.post('/api/admin/savepayments', {
-            adminId: admin._id,
-            adminName: admin.name || 'Unknown',
-            adminProfession: admin.profession || 'Professional',
-            serviceType: requestData.serviceType,
-            description: requestData.description,
-            preferredDate: requestData.preferredDate,
-            preferredTime: requestData.preferredTime,
-            amount: 500,
-            status: 'success',
-            paymentDate: new Date().toISOString(),
-            paymentDetails: paymentDetails,
+          const paymentRecord = {
+            ...paymentRecordBase,
+            requestId: null,
             error: 'Payment successful but request creation failed',
-            userId: user.id // Add the user ID for filtering
-          });
+            backendError: error?.response?.data || error?.message || String(error)
+          };
+          await axios.post('/api/admin/savepayments', paymentRecord);
         } catch (err) {
           console.error('Error saving payment record:', err);
         }
@@ -233,23 +230,26 @@ import React, { useState, useEffect } from "react";
     };
 
     // Payment failure handler
-    const handlePaymentFailure = async (error) => {
+    const handlePaymentFailure = async (errObj) => {
+      // build failure record
+      const failureRecord = {
+        adminId: admin?._id || admin?.id || null,
+        adminName: admin?.name || "Unknown",
+        adminProfession: admin?.profession || "Professional",
+        amount: 500,
+        currency: 'INR',
+        status: 'failed',
+        paymentDate: new Date().toISOString(),
+        paymentDetails: typeof errObj === 'string' ? errObj : JSON.stringify(errObj),
+        error: errObj?.message || errObj || 'Payment failed',
+        userId: user?._id || user?.id || null,
+        userName: user?.name || '',
+        userEmail: user?.email || ''
+      };
+
       try {
         // Save failed payment history directly to the backend
-        await axios.post('/api/admin/savepayments', {
-          adminId: admin._id,
-          adminName: admin.name || 'Unknown',
-          adminProfession: admin.profession || 'Professional',
-          serviceType: requestData.serviceType,
-          description: requestData.description,
-          preferredDate: requestData.preferredDate,
-          preferredTime: requestData.preferredTime,
-          amount: 500,
-          status: 'failed',
-          paymentDate: new Date().toISOString(),
-          error: error,
-          userId: user.id // Add the user ID for filtering
-        });
+        await axios.post('/api/admin/savepayments', failureRecord);
       } catch (err) {
         console.error('Error saving failed payment record:', err);
       }
@@ -913,6 +913,8 @@ import React, { useState, useEffect } from "react";
                           onFailure={handlePaymentFailure}
                           onBack={handleBack}
                           loading={paymentLoading}
+                          adminId={admin._id}
+                          requestId={null}
                         />
                       )}
                     </Box>
@@ -1153,7 +1155,7 @@ import React, { useState, useEffect } from "react";
     );
   };
 
-  const PaymentStep = ({ onComplete, onFailure, onBack, loading }) => {
+  const PaymentStep = ({ onComplete, onFailure, onBack, loading, adminId, requestId }) => {
     return (
       <Card sx={{ mb: 2 }}>
         <CardContent>
@@ -1172,10 +1174,14 @@ import React, { useState, useEffect } from "react";
             
             <RazorpayButton 
               amount={500} 
+              adminId={adminId}
+              requestId={requestId}
               onSuccess={onComplete}
               onFailure={onFailure}
               buttonText="Pay ₹5.00"
               loading={loading}
+              description="Service Request Payment"
+              paymentType="ServiceRequest"
             />
           </Box>
 

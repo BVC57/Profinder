@@ -23,6 +23,12 @@ const adminSchema = new mongoose.Schema({
   subscriptionActive: { type: Boolean, default: false },
   subscriptionPlan: { type: String, enum: ["basic", "pro", "unlimited"], default: "basic" },
   subscriptionExpiry: { type: Date }, 
+  // Unified subscription object used by routes/controllers and frontend
+  subscription: {
+    plan: { type: String, enum: ['trial', 'pro'], default: 'trial' },
+    usage: { type: Number, default: 0 },
+    renewalDate: { type: Date }
+  },
   status: { type: String, enum: ['pending', 'verified', 'rejected'], default: 'pending' }
 
 }, { timestamps: true });

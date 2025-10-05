@@ -230,13 +230,12 @@ const AdminList = () => {
       setSelectedAdmin(admin);
       setProfileDialogOpen(true);
 
-      // Fetch detailed admin profile
-      const response = await axios.get(`/api/user/${admin._id}`);
-      setSelectedAdmin(response.data);
-      console.log("Fetched admin profile:", response.data);
+      // Use the admin data we already have from the verified admins list
+      // No need to fetch again as we already have all the required data
+      console.log("Using admin profile:", admin);
     } catch (error) {
-      console.error("Error fetching admin profile:", error);
-      setSelectedAdmin(admin); // Use basic info if detailed fetch fails
+      console.error("Error setting admin profile:", error);
+      setSelectedAdmin(admin); // Use basic info if there's any issue
     } finally {
       setProfileLoading(false);
     }

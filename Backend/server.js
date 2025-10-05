@@ -22,7 +22,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ["http://localhost:3000", "http://192.168.31.3:3000", "http://192.168.31.3:5000"],
+    origin: ["http://localhost:3000", "http://192.168.31.3:3000", "http://10.66.206.92:3000"],
     methods: ["GET", "POST"]
   }
 });
@@ -31,7 +31,7 @@ const io = socketIo(server, {
 global.io = io;
 
 app.use(cors({
-  origin: ["http://localhost:3000", "http://192.168.31.3:3000", "http://192.168.31.3:5000"],
+  origin: ["http://localhost:3000", "http://192.168.31.3:3000", "http://10.66.206.92:3000"],
   credentials: true
 }));
 app.use(express.json());
@@ -102,5 +102,5 @@ app.use((error, req, res, next) => {
   res.status(500).json({ message: 'Internal server error' });
 });
 
-const PORT = config.PORT || 5000;
-server.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT} and accessible at http://192.168.31.3:${PORT}`));
+const PORT = config.PORT || 3000;
+server.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT} and accessible at http://10.66.206.92:${PORT}`));

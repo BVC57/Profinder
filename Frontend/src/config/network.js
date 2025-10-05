@@ -2,9 +2,9 @@
 const config = {
   // Development - Local network access
   development: {
-    apiUrl: 'http://192.168.31.3:5000',
-    socketUrl: 'http://192.168.31.3:5000',
-    frontendUrl: 'http://192.168.31.3:3000'
+    apiUrl: 'http://10.66.206.92:3000',
+    socketUrl: 'http://10.66.206.92:3000',
+    frontendUrl: 'http://10.66.206.92:3000'
   },
   // Local development
   local: {
@@ -22,7 +22,7 @@ const config = {
 
 // Get current environment
 const getEnvironment = () => {
-  if (window.location.hostname === '192.168.31.3') {
+  if (window.location.hostname === '10.66.206.92' || window.location.hostname === '192.168.31.3') {
     return 'development';
   } else if (window.location.hostname === 'localhost') {
     return 'local';

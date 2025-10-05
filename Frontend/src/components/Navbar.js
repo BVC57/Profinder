@@ -76,7 +76,7 @@ const Navbar = () => {
   const [loadingPaymentHistory, setLoadingPaymentHistory] = useState(false);
   const { user, isAuthenticated, loading, logout } = useAuth();
   const { sidebarOpen, toggleSidebar } = useSidebar();
-
+console.log("pymt",paymentHistory)
   // Fetch unread notification count
   useEffect(() => {
     const fetchUnreadCount = async () => {
@@ -121,6 +121,7 @@ const Navbar = () => {
         // Transform the data to match the expected format
         const formattedPayments = response.data.payments.map(payment => ({
           id: payment._id,
+          name : payment.name || 'Unknown',
           adminName: payment.adminName || 'Unknown',
           adminProfession: payment.adminProfession || 'Professional',
           paymentDate: payment.createdAt,

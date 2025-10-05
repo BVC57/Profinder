@@ -264,22 +264,29 @@ router.put('/update-status/:requestId', auth, authorizeRoles('admin'), async (re
       return res.status(400).json({ message: 'Request must be approved before starting work' });
     }
 
-    // If completing a request, check and update subscription usage
+    // If completing a request, enforce subscription usage and update counters
     if (status === 'completed') {
-      // Fetch latest admin profile
       const adminDoc = await AdminProfile.findById(adminProfile._id);
-      if (adminDoc.subscription.plan === 'trial') {
-        if (adminDoc.subscription.usage >= 10) {
+      if (adminDoc) {
+        // Ensure subscription object exists with defaults
+        if (!adminDoc.subscription) {
+          adminDoc.subscription = { plan: 'trial', usage: 0 };
+        } else {
+          if (!adminDoc.subscription.plan) adminDoc.subscription.plan = 'trial';
+          if (typeof adminDoc.subscription.usage !== 'number') adminDoc.subscription.usage = 0;
+        }
+
+        // Enforce trial limit of 10 completions
+        if (adminDoc.subscription.plan === 'trial' && adminDoc.subscription.usage >= 10) {
           return res.status(403).json({ message: 'Trial plan limit reached. Please upgrade to Pro to complete more requests.' });
         }
-        adminDoc.subscription.usage = (adminDoc.subscription.usage || 0) + 1;
-        // If just reached 10, optionally notify admin
-        if (adminDoc.subscription.usage === 10) {
-          // Optionally, send notification or email here
-        }
-        await adminDoc.save();
-      } else if (adminDoc.subscription.plan === 'pro') {
-        adminDoc.subscription.usage = (adminDoc.subscription.usage || 0) + 1;
+
+        // Increment usage for both plans (useful for analytics/UX)
+        adminDoc.subscription.usage += 1;
+
+        // Also track completed requests separately
+        adminDoc.completedRequests = (adminDoc.completedRequests || 0) + 1;
+
         await adminDoc.save();
       }
     }

@@ -22,6 +22,10 @@ const PaymentRequestPage = ({
   const razorpayCheckoutId = localStorage.getItem("rzp_stored_checkout_id") || "N/A";
   const navigate = useNavigate();
   
+  // Debug logging for adminId
+  console.log('RazorpayButton - adminId received:', adminId);
+  console.log('RazorpayButton - requestId received:', requestId);
+  
   const [paymentStatus, setPaymentStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -92,8 +96,8 @@ const PaymentRequestPage = ({
           // Save successful payment
           const paymentData = {
             userId: userId,
-            adminId: adminId,
-            requestId: requestId,
+            adminId: adminId || null,
+            requestId: requestId || null,
             amount: amount / 100,
             currency: "INR",
             razorpayPaymentId: response.razorpay_payment_id,
@@ -136,8 +140,8 @@ const PaymentRequestPage = ({
           // Save cancelled payment
           const paymentData = {
             userId: userId,
-            adminId: adminId,
-            requestId: requestId,
+            adminId: adminId || null,
+            requestId: requestId || null,
             amount: amount / 100,
             currency: "INR",
             razorpayPaymentId: "CANCELLED_" + Date.now(),
@@ -181,8 +185,8 @@ const PaymentRequestPage = ({
         // Save failed payment
         const paymentData = {
           userId: userId,
-          adminId: adminId,
-          requestId: requestId,
+          adminId: adminId || null,
+          requestId: requestId || null,
           amount: amount / 100,
           currency: "INR",
           razorpayPaymentId: "FAILED_" + Date.now(),
